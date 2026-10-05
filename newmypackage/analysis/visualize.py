@@ -13,6 +13,7 @@ def plot_visualization(image, boxes, masks, classes, probabilty, output, seg=Tru
   # The function should plot the predicted segmentation maps and the bounding boxes on the images and save them.
   # Tip: keep the dimensions of the output image less than 800 to avoid RAM crashes.
   
+  # indices of the (up to) three most confident detections
   temp = sorted(probabilty)[-3:]
   maxthree = []
   for prob in temp:
@@ -24,13 +25,16 @@ def plot_visualization(image, boxes, masks, classes, probabilty, output, seg=Tru
   ax = plt.subplot(1,2,2)
 
   if seg == True:
+    if not maxthree:  # nothing detected: show an empty mask
+      plt.imshow(np.zeros(image.shape[:2]), cmap = 'Greys')
+      plt.savefig(output)
+      return
+    # combine the masks of the selected detections; each mask is (1, H, W)
     mask = masks[maxthree[0]]
-    for i, m in enumerate(maxthree):
-      if i == 1:
-          continue
+    for m in maxthree[1:]:
       mask = mask + masks[m]
 
-    plt.imshow((mask.transpose(2,1,0) * 255), cmap = 'Greys')
+    plt.imshow((mask[0] * 255), cmap = 'Greys')
     plt.savefig(output)
   else:
     plt.imshow(image)

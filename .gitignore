@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+build/
+dist/
+*.egg-info/
+
+# Written by the GUI at runtime
+output/
+
+.DS_Store

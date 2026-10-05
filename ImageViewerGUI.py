@@ -27,16 +27,29 @@ def fileClick(clicked, segmentor, dataset):
 	# To have a better clarity, please check out the sample video.
 
 	filename = fd.askopenfilename(initialdir = './data/imgs/')
-	imgnum = int(filename[-5])
+	if not filename:  # dialog was cancelled
+		return
 
-	datavals = []
+	# Find the dataset entry for the chosen image file
+	imgnum = None
 	for i in range(len(dataset)):
-			datavals.append(dataset.__getitem__(i))
-	
-	boxes, masks, classes, scores = segmentor.__call__(numpy.asarray((datavals[imgnum]['image'].transpose((2, 1, 0)) / 255)))
+		if os.path.basename(dataset.data[i]['img_fn']) == os.path.basename(filename):
+			imgnum = i
+			break
+	if imgnum is None:
+		notfound = Label(root, text = 'This image is not in the annotation file. Please choose an image from data/imgs.')
+		notfound.grid(row=2, column=0, columnspan = 4)
+		return
 
-	plot_visualization(dataset[imgnum]['image'], boxes, masks, classes, scores, f'./output/seg.jpg', True)
-	plot_visualization(dataset[imgnum]['image'], boxes, masks, classes, scores, f'./output/bb.jpg', False)
+	e.delete(0, END)
+	e.insert(0, filename)
+
+	# The dataset gives the image as (H, W, 3); the model expects (3, H, W) in [0, 1]
+	image = dataset[imgnum]['image']
+	boxes, masks, classes, scores = segmentor(numpy.asarray(image.transpose((2, 0, 1)) / 255))
+
+	plot_visualization(image, boxes, masks, classes, scores, './output/seg.jpg', True)
+	plot_visualization(image, boxes, masks, classes, scores, './output/bb.jpg', False)
 
 	if(clicked.get() == "Segmentation"):
 		image = Image.open('./output/seg.jpg')
@@ -89,9 +102,11 @@ def process(clicked):
 # `main` function definition starts from here.
 if __name__ == '__main__':
 
+	# Start with no output from a previous run
+	os.makedirs('./output', exist_ok=True)
 	if(os.path.exists("./output/seg.jpg")):
 		os.remove('./output/seg.jpg')
-	if(os.path.exists("./output/seg.jpg")):
+	if(os.path.exists("./output/bb.jpg")):
 		os.remove('./output/bb.jpg')
 	
 	####### CODE REQUIRED (START) ####### (2 lines)

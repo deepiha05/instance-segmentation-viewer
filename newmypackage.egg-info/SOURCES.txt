@@ -1,8 +1,0 @@
-license.txt
-setup.py
-newmypackage/__init__.py
-newmypackage/model.py
-newmypackage.egg-info/PKG-INFO
-newmypackage.egg-info/SOURCES.txt
-newmypackage.egg-info/dependency_links.txt
-newmypackage.egg-info/top_level.txt

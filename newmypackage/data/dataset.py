@@ -60,7 +60,7 @@ class Dataset(object):
 
         if self.transforms:
             for x in self.transforms:
-                final_img = x.__call__(img)
+                final_img = x(final_img)  # apply each transform to the previous result
         img_array = np.array(final_img).astype(np.uint8)
 
         boxes = []
